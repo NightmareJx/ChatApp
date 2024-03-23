@@ -1,0 +1,100 @@
+var notificationData;
+    if (
+      !newMessageRecieved.sender._id ||
+      !newMessageRecieved.chat._id ||
+      !newMessageRecieved.content
+    ) {
+      console.log("senderID , content and chatID is required in the req body");
+      return null; // Return null if required fields are missing
+    }
+
+    try {
+      const content = newMessageRecieved.content;
+      const senderObjectId = new mongoose.Types.ObjectId(
+        newMessageRecieved.sender._id
+      );
+      const chatObjectId = new mongoose.Types.ObjectId(
+        newMessageRecieved.chat._id
+      );
+
+      const existingNotif = await Notification.find({
+        sender: senderObjectId,
+        chat: chatObjectId,
+      });
+
+      if (existingNotif.length > 0) {
+        // Update existing notification
+        const updatedNotif = await Notification.findByIdAndUpdate(
+          existingNotif[0]._id,
+          { $inc: { numNotif: 1 }, $set: { content: content } }, // Increment numNotif by 1
+          { new: true } // Return updated document
+        )
+          .populate("sender", "name pic")
+          .populate("chat");
+        notificationData = await User.populate(updatedNotif, {
+          path: "chat.users",
+          select: "name pic email",
+        });
+      } else {
+        var notif = await Notification.create({
+          sender: senderObjectId,
+          content: content,
+          chat: chatObjectId,
+        });
+        notif = await notif.populate("sender", "name pic");
+        notif = await notif.populate("chat");
+        notif = await User.populate(notif, {
+          path: "chat.users",
+          select: "name pic email",
+        });
+        notificationData = notif; // Assign the created notification
+      }
+
+      console.log(
+        "Notification created/updated successfully:",
+        notificationData
+      );
+    } catch (error) {
+      console.log(error.message);
+      notificationData = null;
+    }
+
+
+
+
+
+
+    {isTyping ? (
+        <div
+          style={{ display: "flex", marginTop: "10px", marginBottom: "0px" }}
+        >
+          <Tooltip
+            label={messages[0].sender.name}
+            placement="bottom-start"
+            hasArrow
+          >
+            <Avatar
+              mt={"7px"}
+              mr={1}
+              size={"sm"}
+              cursor={"pointer"}
+              name={messages[0].sender.name}
+              src={messages[0].sender.pic}
+            />
+          </Tooltip>
+          <span
+            style={{
+              paddingBottom: "35px",
+            }}
+          >
+            <div>
+              <Lottie
+                options={defaultOptions}
+                width={40}
+                style={{ marginLeft: 0, marginBottom: 5 }}
+              />
+            </div>
+          </span>
+        </div>
+      ) : null}
+
