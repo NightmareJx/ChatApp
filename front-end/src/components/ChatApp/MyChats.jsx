@@ -6,13 +6,41 @@ import { AddIcon } from "@chakra-ui/icons";
 import ChatLoading from "./ChatLoading";
 import GroupChatModal from "./GroupChatModal";
 import { getSender } from "../../config/getSender";
+import { io } from "socket.io-client";
+
+const ENDPOINT = "http://localhost:4000";
+var socket;
 
 const MyChats = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
+  const [socketConnected, setSocketConnected] = useState(false);
   const { user, selectedChat, SetselectedChat, chats, setChats, refetch } =
     useChatContext();
+  const [LatestMessage, setLatestMessage] = useState([]);
 
   const toast = useToast();
+
+  // Socket.io setup
+  useEffect(() => {
+    const newSocket = io(ENDPOINT);
+    newSocket.emit("setup", user);
+    newSocket.on("connected", () => {
+      setSocketConnected(true);
+    });
+    newSocket.on("new message", (newMessageReceived) => {
+      console.log("New message received:", newMessageReceived);
+      setLatestMessage([newMessageReceived]);
+    });
+
+    // Cleanup function to disconnect socket when component unmounts
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
+
+  if (socketConnected) {
+    console.log("connected");
+  }
 
   const fetchChats = async () => {
     try {
@@ -41,6 +69,7 @@ const MyChats = ({ fetchAgain }) => {
     fetchChats();
   }, [refetch]);
 
+  console.log(LatestMessage);
   return (
     <Box
       display={{ base: selectedChat ? "none" : "flex", md: "flex" }}
@@ -85,7 +114,7 @@ const MyChats = ({ fetchAgain }) => {
         overflowY={"hidden"}
       >
         {chats ? (
-          <Stack overflowY={"scroll"}>
+          <Stack overflowY={"scroll"} overflowX={"hidden"}>
             {chats.map((chat) => (
               <Box
                 onClick={() => SetselectedChat(chat)}
@@ -98,9 +127,28 @@ const MyChats = ({ fetchAgain }) => {
                 key={chat._id}
               >
                 <Text>
-                  {!chat.isGroupChat
-                    ? getSender(loggedUser, chat.users)
-                    : chat.chatName}
+                  <b>
+                    {!chat.isGroupChat
+                      ? getSender(loggedUser, chat.users)
+                      : chat.chatName}
+                  </b>
+                </Text>
+                <Text>
+                  {LatestMessage.length ? (
+                    <span style={{ display: "inline-block" }}>
+                      {LatestMessage[0].sender.name} :{" "}
+                      {LatestMessage[0].content}
+                    </span>
+                  ) : chat.latestMessage ? (
+                    <span style={{ display: "inline-block" }}>
+                      {chat.latestMessage.sender.name} :{" "}
+                      {chat.latestMessage.content}
+                    </span>
+                  ) : (
+                    <span style={{ display: "inline-block" }}>
+                      No Messages Yet
+                    </span>
+                  )}
                 </Text>
               </Box>
             ))}

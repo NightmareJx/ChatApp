@@ -1,5 +1,3 @@
-import { m } from "framer-motion";
-
 export const getSender = (loggedUser, users) => {
   //console.log("Logged User:", loggedUser); // Log the logged-in user
   //console.log("Users Array:", users); // Log the users array

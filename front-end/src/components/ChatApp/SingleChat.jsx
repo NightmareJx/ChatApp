@@ -145,8 +145,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       } catch (error) {
         console.error("Error emitting 'new message' event:", error);
       }
-      // we will send the message to socket.io as newrecievedmessage
-      console.log("pass to socketio", data);
       // Append the new message to the existing messages array
       setMessages([...messages, data]);
     } catch (error) {
@@ -188,8 +186,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         } catch (error) {
           console.error("Error emitting 'new message' event:", error);
         }
-        // we will send the message to socket.io as newrecievedmessage
-        console.log("pass to socketio", data);
         // Append the new message to the existing messages array
         setMessages([...messages, data]);
       } catch (error) {
@@ -216,7 +212,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   // then we will display notification else if it is he will add it to the messages so we can display them all in realtime
 
   useEffect(() => {
-    socket.on("message recieved", async (newMessageRecieved) => {
+    socket.on("message recieved", (newMessageRecieved) => {
       setMessages((prevMessages) => [...prevMessages, newMessageRecieved]);
       setRefetch(!refetch);
     });
@@ -318,14 +314,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                     </Tooltip>
                     <span
                       style={{
-                        paddingBottom: "35px",
+                        paddingBottom: "5px",
                       }}
                     >
                       <div>
                         <Lottie
                           options={defaultOptions}
                           width={40}
-                          style={{ marginLeft: 0, marginBottom: 5 }}
+                          style={{ marginLeft: 0, marginBottom: 1 }}
                         />
                       </div>
                     </span>
