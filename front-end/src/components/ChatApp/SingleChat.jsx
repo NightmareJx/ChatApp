@@ -32,7 +32,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
 
-  const { user, selectedChat, SetselectedChat } = useChatContext();
+  const { user, selectedChat, SetselectedChat, setRefetch, refetch } =
+    useChatContext();
   const toast = useToast();
 
   //lottie option
@@ -172,6 +173,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   useEffect(() => {
     socket.on("message recieved", async (newMessageRecieved) => {
       setMessages((prevMessages) => [...prevMessages, newMessageRecieved]);
+      setRefetch(!refetch);
     });
   }, []);
 

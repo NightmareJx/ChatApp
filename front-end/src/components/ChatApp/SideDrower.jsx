@@ -22,15 +22,13 @@ import {
   Toast,
   Spinner,
 } from "@chakra-ui/react";
-import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import React, { useEffect, useState } from "react";
 import { useChatContext } from "../../hook/useChatContext";
 import ProfileModule from "./ProfileModule";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import UserListItem from "./UserListItem";
-import { getSender } from "../../config/getSender";
-import { Navigate, useNavigate } from "react-router-dom";
 
 const SideDrower = () => {
   const [search, setSearch] = useState("");
@@ -88,15 +86,10 @@ const SideDrower = () => {
     }
   };
 
-  const handleSearch = async () => {
-    if (!search) {
-      Toast({
-        title: "Please Enter Somthing in the search.",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "top-left",
-      });
+  const handleSearch = async (typing) => {
+    if (!typing) {
+      setSearchResault([]);
+      return;
     }
 
     try {
@@ -108,7 +101,7 @@ const SideDrower = () => {
         },
       };
 
-      const { data } = await axios.get(`/api/user?search=${search}`, config);
+      const { data } = await axios.get(`/api/user?search=${typing}`, config);
 
       setLoading(false);
       setSearchResault(data);
@@ -182,9 +175,12 @@ const SideDrower = () => {
                 placeholder="Search by username or email"
                 mr={2}
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                width={"100%"}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  handleSearch(e.target.value);
+                }}
               />
-              <Button onClick={handleSearch}>Go</Button>
             </Box>
             {loading ? (
               <ChatLoading />

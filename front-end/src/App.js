@@ -9,6 +9,7 @@ import LoadingPage from "./components/Loading/LoadingPage";
 function App() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [appHeight, setAppHeight] = useState(0);
 
   useEffect(() => {
     // Simulate async initialization (replace with actual async logic)
@@ -19,14 +20,29 @@ function App() {
       }
       setLoading(false);
     }, 3000); // Adjust delay as needed
-  }, []);
+
+    const updateAppHeight = () => {
+      const height = document.getElementById("root").clientHeight;
+      setAppHeight(height);
+    };
+
+    window.addEventListener("resize", updateAppHeight);
+    updateAppHeight(); // Initial height
+
+    return () => window.removeEventListener("resize", updateAppHeight);
+  }, []); // Empty dependency array for componentDidMount behavior
 
   if (loading) {
     return <LoadingPage />; // Render loading state while initializing
   }
 
   return (
-    <div className="App">
+    <div
+      className="App"
+      style={{
+        overflowY: appHeight > window.innerHeight ? "scroll" : "hidden",
+      }}
+    >
       <Routes>
         <Route
           path="/"

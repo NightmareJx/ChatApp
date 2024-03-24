@@ -9,7 +9,7 @@ import { getSender } from "../../config/getSender";
 
 const MyChats = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
-  const { user, selectedChat, SetselectedChat, chats, setChats } =
+  const { user, selectedChat, SetselectedChat, chats, setChats, refetch } =
     useChatContext();
 
   const toast = useToast();
@@ -39,7 +39,7 @@ const MyChats = ({ fetchAgain }) => {
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("UserInfo")));
     fetchChats();
-  }, [fetchAgain]);
+  }, [refetch]);
 
   return (
     <Box

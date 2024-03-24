@@ -15,6 +15,10 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+  height: 120vh;
+  background-image: url("../public/pexels-photo-255379.jpeg");
+  background-size: cover;
+  background-position: center;
 }
 
 /* Apply styles to the container to take up the whole page */
@@ -32,20 +36,16 @@ body {
 .App {
   height: 100vh; /* This should work fine for taking full viewport height */
   display: flex;
-  background-image: url("../public/pexels-photo-255379.jpeg");
-  background-size: cover;
-  background-position: center;
 }
 
 /* Optional: Hide scrollbar */
 body {
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 
 ::-webkit-scrollbar {
-  width: 0;
+  width: 5px;
 }
 
 ::-webkit-scrollbar-thumb {

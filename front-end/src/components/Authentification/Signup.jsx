@@ -120,8 +120,7 @@ const Signup = () => {
       handleReload();
     } catch (err) {
       toast({
-        title: "Passwords Does Not Match",
-        description: err.response.data.error,
+        title: err.message,
         status: "warning",
         duration: 5000,
         isClosable: true,
