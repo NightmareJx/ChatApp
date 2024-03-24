@@ -3,6 +3,7 @@ import { useChatContext } from "../../hook/useChatContext";
 import {
   Avatar,
   Box,
+  Button,
   FormControl,
   IconButton,
   Input,
@@ -11,7 +12,7 @@ import {
   Tooltip,
   useToast,
 } from "@chakra-ui/react";
-import { ArrowBackIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, ArrowForwardIcon } from "@chakra-ui/icons";
 import { getSender, getSenderFull } from "../../config/getSender";
 import ProfileModule from "./ProfileModule";
 import UpdateGroupChatModal from "./UpdateGroupChatModal";
@@ -107,6 +108,50 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     } catch (error) {
       return toast({
         title: "Failed to fetch messages",
+        description: error.message || JSON.stringify(error),
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-left",
+      });
+    }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    socket.emit("stop typing", selectedChat._id);
+    setTyping(false);
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      setNewMessage("");
+      const { data } = await axios.post(
+        "/api/message/",
+        {
+          content: newMessage,
+          chatID: selectedChat._id,
+        },
+        config
+      );
+
+      try {
+        socket.emit("new message", data);
+      } catch (error) {
+        console.error("Error emitting 'new message' event:", error);
+      }
+      // we will send the message to socket.io as newrecievedmessage
+      console.log("pass to socketio", data);
+      // Append the new message to the existing messages array
+      setMessages([...messages, data]);
+    } catch (error) {
+      return toast({
+        title: "Failed to send the message",
         description: error.message || JSON.stringify(error),
         status: "error",
         duration: 5000,
@@ -247,49 +292,72 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 <ScrollableChat messages={messages} isTyping={isTyping} />
               </div>
             )}
-
-            <FormControl onKeyDown={sendMessage} isRequired mt={1}>
-              {isTyping ? (
+            <form onSubmit={handleSubmit}>
+              <FormControl onKeyDown={sendMessage} isRequired mt={1}>
+                {isTyping ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      marginTop: "10px",
+                      marginBottom: "0px",
+                    }}
+                  >
+                    <Tooltip
+                      label={user.name}
+                      placement="bottom-start"
+                      hasArrow
+                    >
+                      <Avatar
+                        mt={"7px"}
+                        mr={1}
+                        size={"sm"}
+                        cursor={"pointer"}
+                        name={user.name}
+                        src={user.pic}
+                      />
+                    </Tooltip>
+                    <span
+                      style={{
+                        paddingBottom: "35px",
+                      }}
+                    >
+                      <div>
+                        <Lottie
+                          options={defaultOptions}
+                          width={40}
+                          style={{ marginLeft: 0, marginBottom: 5 }}
+                        />
+                      </div>
+                    </span>
+                  </div>
+                ) : null}
                 <div
                   style={{
                     display: "flex",
-                    marginTop: "10px",
-                    marginBottom: "0px",
+                    gap: 1,
+                    width: "100%",
+                    justifyContent: "space-between",
+                    marginTop: "20px",
                   }}
                 >
-                  <Tooltip label={user.name} placement="bottom-start" hasArrow>
-                    <Avatar
-                      mt={"7px"}
-                      mr={1}
-                      size={"sm"}
-                      cursor={"pointer"}
-                      name={user.name}
-                      src={user.pic}
-                    />
-                  </Tooltip>
-                  <span
-                    style={{
-                      paddingBottom: "35px",
-                    }}
+                  <Input
+                    variant={"filled"}
+                    bg={"#E0E0E0"}
+                    placeholder="Enter your message..."
+                    onChange={typingHandler}
+                    value={newMessage}
+                    width={"100%"}
+                  />
+                  <Button
+                    colorScheme="blue"
+                    onClick={sendMessage}
+                    type="submit"
                   >
-                    <div>
-                      <Lottie
-                        options={defaultOptions}
-                        width={40}
-                        style={{ marginLeft: 0, marginBottom: 5 }}
-                      />
-                    </div>
-                  </span>
+                    <ArrowForwardIcon />
+                  </Button>
                 </div>
-              ) : null}
-              <Input
-                variant={"filled"}
-                bg={"#E0E0E0"}
-                placeholder="Enter your message..."
-                onChange={typingHandler}
-                value={newMessage}
-              />
-            </FormControl>
+              </FormControl>
+            </form>
           </Box>
         </>
       ) : (
