@@ -74,10 +74,10 @@ const Signup = () => {
       setPicLoading(false);
       handleReload();
     } catch (error) {
-      console.log(error);
+      let errorMessage = error.response.data.error || "An error occurred";
       toast({
         title: "Error Occured!",
-        description: error.response.data.error,
+        description: errorMessage,
         status: "error",
         duration: 5000,
         isClosable: true,

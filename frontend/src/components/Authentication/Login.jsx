@@ -60,9 +60,11 @@ const Login = () => {
       setLoading(false);
       handleReload();
     } catch (error) {
+      let errorMessage = error.response.data.error || "An error occurred";
+      console.log(error);
       toast({
         title: "Error Occured!",
-        description: error.response.data.message,
+        description: errorMessage,
         status: "error",
         duration: 5000,
         isClosable: true,

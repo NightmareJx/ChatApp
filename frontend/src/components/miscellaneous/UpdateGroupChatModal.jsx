@@ -31,10 +31,9 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   const [renameloading, setRenameLoading] = useState(false);
   const toast = useToast();
 
-  const { selectedChat, setSelectedChat, user } = ChatState();
+  const { selectedChat, SetSelectedChat, user } = ChatState();
 
   const handleSearch = async (query) => {
-    setSearch(query);
     if (!query) {
       return;
     }
@@ -47,7 +46,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
         },
       };
       const { data } = await axios.get(
-        `http://localhost:4000/api/user?search=${search}`,
+        `http://localhost:4000/api/user?search=${query}`,
         config
       );
       console.log(data);
@@ -76,7 +75,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.put(
+      const response = await axios.put(
         `http://localhost:4000/api/chat/rename`,
         {
           chatId: selectedChat._id,
@@ -85,22 +84,35 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
         config
       );
 
-      console.log(data._id);
-      // setSelectedChat("");
-      setSelectedChat(data);
+      console.log(response.data);
+      SetSelectedChat(response.data);
       setFetchAgain(!fetchAgain);
       setRenameLoading(false);
     } catch (error) {
+      console.error("Error:", error); // Log the error for debugging purposes
+      let errorMessage = "An error occurred"; // Default error message
+
+      // Check if there's a response from the server with a specific error message
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        errorMessage = error.response.data.message;
+      }
+
       toast({
-        title: "Error Occured!",
-        description: error.response.data.message,
+        title: "Error Occurred!",
+        description: errorMessage,
         status: "error",
         duration: 5000,
         isClosable: true,
         position: "bottom",
       });
+
       setRenameLoading(false);
     }
+
     setGroupChatName("");
   };
 
@@ -143,7 +155,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
         config
       );
 
-      setSelectedChat(data);
+      SetSelectedChat(data);
       setFetchAgain(!fetchAgain);
       setLoading(false);
     } catch (error) {
@@ -188,7 +200,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
         config
       );
 
-      user1._id === user._id ? setSelectedChat() : setSelectedChat(data);
+      user1._id === user._id ? SetSelectedChat() : SetSelectedChat(data);
       setFetchAgain(!fetchAgain);
       fetchMessages();
       setLoading(false);
