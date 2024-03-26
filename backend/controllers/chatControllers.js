@@ -1,6 +1,6 @@
 const Chat = require("../models/chatModel");
 
-const User = require("../models/UserModel");
+const User = require("../models/userModel");
 
 //@description     Create or fetch One to One Chat
 //@route           POST /api/chat/

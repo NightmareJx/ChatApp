@@ -1,5 +1,5 @@
 const Message = require("../models/messageModel");
-const User = require("../models/UserModel");
+const User = require("../models/userModel");
 const Chat = require("../models/chatModel");
 
 //@description     Get all Messages
