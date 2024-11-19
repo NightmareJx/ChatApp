@@ -29,7 +29,7 @@ const HomePage = () => {
           Chatty App
         </Text>
       </Box>
-      <Box bg="white" w={"100%"} p={4} borderRadius={"lg"} borderWidth={"1px"}>
+      <Box bg="white" w={"100%"} p={4} borderRadius={"lg"} borderWidth={"1px"} overflow={"auto"}>
         <Tabs variant="soft-rounded">
           <TabList mb={"1em"}>
             <Tab width={"50%"}>Login</Tab>

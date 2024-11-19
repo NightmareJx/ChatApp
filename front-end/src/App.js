@@ -40,6 +40,7 @@ function App() {
     <div
       className="App"
       style={{
+         height: "100vh",
         overflowY: appHeight > window.innerHeight ? "scroll" : "hidden",
       }}
     >
